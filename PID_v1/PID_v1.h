@@ -5,6 +5,7 @@
 class PID
 {
 
+
   public:
 
   //Constants used in some of the functions below
@@ -14,9 +15,13 @@ class PID
   #define REVERSE  1
 
   //commonly used functions **************************************************************************
-	PID(double*, double*, double*,			// * constructor.  links the PID to the Input, Output, and 
-		double, double, double, double, int);	//   Setpoint.  Initial tuning parameters are also set here
-								//   kp, ki, kd, kf, direction
+	PID(double*, double*, double*,		// * constructor.  links the PID to the Input, Output, and 
+		double, double, double, int);	//   Setpoint.  Initial tuning parameters are also set here
+								//   kp, ki, kd, direction
+	
+	PID(double*, double*, double*, double*,		// * constructor overloaded with link
+		double, double, double, int);		//   to feedforward term   
+	
 	
 	void SetMode(int Mode);				// * sets PID to either Manual (0) or Auto (non-0)
 
@@ -31,7 +36,7 @@ class PID
 
   //available but not commonly used functions ********************************************************
 	void SetTunings(double, double,	// * While most users will set the tunings once in the 
-		double, double);		//   constructor, this function gives the user the option
+		double);		//   constructor, this function gives the user the option
 						//   of changing tunings during runtime for Adaptive control
 	
 	void SetControllerDirection(int);	// * Sets the Direction, or "Action" of the controller. DIRECT
@@ -43,16 +48,12 @@ class PID
 						//   the PID calculation is performed.  default is 100
 										  
 	void SetWindupI(double); // set the integral windup limit (default is outMax)
-	
-	void SetFFzero(double); // set the zero point for the feedforward term (default is 0; for temp control, set to ambient)
 										  
   //Display functions ****************************************************************
 	double GetKp();	// These functions query the pid for interal values.
 	double GetKi();	//  they were created mainly for the pid front-end,
 	double GetKd();	// where it's important to know what is actually 
-	double GetKf();	// inside the PID.
 	double GetWi();
-	double GetFFzero();
 	int GetMode();
 	int GetDirection();
 
@@ -62,25 +63,22 @@ class PID
 	double dispKp;	// * we'll hold on to the tuning parameters in user-entered 
 	double dispKi;	//   format for display purposes
 	double dispKd;
-	double dispKf;
     
 	double kp;		// * (P)roportional Tuning Parameter
 	double ki;		// * (I)ntegral Tuning Parameter
 	double kd;		// * (D)erivative Tuning Parameter
-	double kf;		// * (F)eedforward turning parameter
-	double ff_zero; 	//  * feedforward zero point
 
 	int controllerDirection;
 
 	double *myInput;		// * Pointers to the Input, Output, and Setpoint variables
 	double *myOutput;		//   This creates a hard link between the variables and the 
 	double *mySetpoint;		//   PID, freeing the user from having to constantly tell us
-					//   what these values are.  with pointers we'll just know.
-			  
+	double *myFF;		//   what these values are.  with pointers we'll just know.
+	bool ffActive;			// flag for feedforward		  
 	unsigned long lastTime;
-	double iTerm, lastInput;
+	double ITerm, lastInput;
 	double windupI;		// windup limit for integral term
-	int sampleTime;
+	int SampleTime;
 	double outMin, outMax;
 	bool inAuto;
 };

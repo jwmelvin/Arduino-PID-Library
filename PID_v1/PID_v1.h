@@ -47,18 +47,23 @@ class PID
 	void SetSampleTime(int);		// * sets the frequency, in Milliseconds, with which 
 						//   the PID calculation is performed.  default is 100
 										  
-	void SetWindupI(double); // set the integral windup limit (default is outMax)
+	void SetWindupI (double); // set the integral windup limit (default is outMax)
+	void SetWindupI (double , double);	// overloaded for non-symmetric windup limits
 										  
   //Display functions ****************************************************************
 	double GetKp();	// These functions query the pid for interal values.
 	double GetKi();	//  they were created mainly for the pid front-end,
 	double GetKd();	// where it's important to know what is actually 
 	double GetWi();
+	double GetWiU();
+	double GetWiL();
+	
 	int GetMode();
 	int GetDirection();
 
   private:
 	void Initialize();
+	void windupPrevent();
 	
 	double dispKp;	// * we'll hold on to the tuning parameters in user-entered 
 	double dispKi;	//   format for display purposes
@@ -77,9 +82,10 @@ class PID
 	bool ffActive;			// flag for feedforward		  
 	unsigned long lastTime;
 	double ITerm, lastInput;
-	double windupI;		// windup limit for integral term
+	double windupLU, windupLL;	// windup limits for integral term
 	int SampleTime;
 	double outMin, outMax;
 	bool inAuto;
 };
 #endif
+

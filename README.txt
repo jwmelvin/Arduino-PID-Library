@@ -1,9 +1,9 @@
 ***************************************************************
-* Arduino PID Library - Version 1.1.0
+* Arduino PID Library - Version 1.1.1
  
 * by Brett Beauregard <br3ttb@gmail.com> brettbeauregard.com
  
-*
+* modified by Jason Melvin to add feedforward and modified windup limits
  
 * This Library is licensed under a GPLv3 License
 

@@ -1,6 +1,6 @@
 #ifndef PID_v1_h
 #define PID_v1_h
-#define LIBRARY_VERSION	1.0.0
+#define LIBRARY_VERSION	1.1.1
 
 class PID
 {
@@ -17,6 +17,8 @@ class PID
   //commonly used functions **************************************************************************
     PID(double*, double*, double*,        // * constructor.  links the PID to the Input, Output, and 
         double, double, double, int);     //   Setpoint.  Initial tuning parameters are also set here
+	PID(double*, double*, double*, double*,		// * constructor overloaded with link
+		double, double, double, int);		//   to feedforward term   
 	
     void SetMode(int Mode);               // * sets PID to either Manual (0) or Auto (non-0)
 
@@ -42,17 +44,23 @@ class PID
     void SetSampleTime(int);              // * sets the frequency, in Milliseconds, with which 
                                           //   the PID calculation is performed.  default is 100
 										  
+	void SetWindupI (double); // set the integral windup limit (default is outMax)
+	void SetWindupI (double , double);	// overloaded for non-symmetric windup limits
 										  
 										  
   //Display functions ****************************************************************
 	double GetKp();						  // These functions query the pid for interal values.
 	double GetKi();						  //  they were created mainly for the pid front-end,
 	double GetKd();						  // where it's important to know what is actually 
+	double GetWi();
+	double GetWiU();
+	double GetWiL();
 	int GetMode();						  //  inside the PID.
 	int GetDirection();					  //
 
   private:
 	void Initialize();
+	void windupPrevent();
 	
 	double dispKp;				// * we'll hold on to the tuning parameters in user-entered 
 	double dispKi;				//   format for display purposes
@@ -68,9 +76,13 @@ class PID
     double *myOutput;             //   This creates a hard link between the variables and the 
     double *mySetpoint;           //   PID, freeing the user from having to constantly tell us
                                   //   what these values are.  with pointers we'll just know.
+	double *myFF;
+	
+	bool ffActive;			// flag for feedforward		  
 			  
 	unsigned long lastTime;
 	double ITerm, lastInput;
+	double windupLU, windupLL;	// windup limits for integral term
 
 	unsigned long SampleTime;
 	double outMin, outMax;
